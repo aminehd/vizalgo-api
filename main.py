@@ -215,17 +215,80 @@ def _load_lc994():
     }
 
 # ---------------------------------------------------------------------------
+# LC 560 — Subarray Sum Equals K
+# ---------------------------------------------------------------------------
+
+def _load_lc560():
+    from collections import defaultdict
+    from vizalgo import VizEngine
+
+    engine = VizEngine("LC 560", "Subarray Sum Equals K")
+    engine.line_speed = 0.6
+    engine.snap_speed = 1.5
+
+    @engine.solution
+    @engine.show
+    def subarray_sum(nums: list, k: int) -> int:
+        acc = defaultdict(int)
+        acc[0] = 1
+        res = 0
+        prefix_sum = 0
+
+        for i, num in enumerate(nums):
+            prefix_sum += num
+            res += acc[prefix_sum - k]
+            acc[prefix_sum] += 1
+
+            engine.step(
+                locals(),
+                mark={
+                    "nums": {"cursor": i},
+                    "acc":  {"highlight": prefix_sum - k},
+                },
+                label=f"i={i}  prefix={prefix_sum}  lookup acc[{prefix_sum - k}]",
+            )
+
+        return res
+
+    examples = [
+        {"nums": [1, 1, 1],         "k": 2},
+        {"nums": [1, 2, 3],         "k": 3},
+        {"nums": [1, -1, 1, -1, 1], "k": 0},
+    ]
+
+    runs = []
+    for i, ex in enumerate(examples):
+        engine.snapshots = []
+        subarray_sum(ex["nums"], ex["k"])
+        runs.append({
+            "example":      i + 1,
+            "snapshots":    _serialize_snapshots(engine.snapshots),
+            "source_lines": engine.source_lines,
+        })
+
+    return {
+        "id":         "lc560",
+        "problem":    "LC 560",
+        "title":      "Subarray Sum Equals K",
+        "difficulty": "Medium",
+        "pattern":    ["Prefix Sum", "Hashmap"],
+        "runs":       runs,
+    }
+
+# ---------------------------------------------------------------------------
 # Registry
 # ---------------------------------------------------------------------------
 
 PROBLEMS = {
     "lc200": _load_lc200,
     "lc994": _load_lc994,
+    "lc560": _load_lc560,
 }
 
 PROBLEM_META = {
-    "lc200": {"id": "lc200", "title": "Number of Islands",  "difficulty": "Medium", "pattern": ["BFS", "Grid"]},
-    "lc994": {"id": "lc994", "title": "Rotting Oranges",    "difficulty": "Medium", "pattern": ["BFS", "Grid"]},
+    "lc200": {"id": "lc200", "title": "Number of Islands",      "difficulty": "Medium", "pattern": ["BFS", "Grid"]},
+    "lc994": {"id": "lc994", "title": "Rotting Oranges",        "difficulty": "Medium", "pattern": ["BFS", "Grid"]},
+    "lc560": {"id": "lc560", "title": "Subarray Sum Equals K",  "difficulty": "Medium", "pattern": ["Prefix Sum", "Hashmap"]},
 }
 
 _cache: dict = {}
