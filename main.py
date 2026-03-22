@@ -227,7 +227,10 @@ def _load_lc560():
     engine.snap_speed = 1.5
 
     @engine.solution
-    @engine.show
+    @engine.show(mark=lambda locs: {
+        "nums": {"cursor": locs.get("i")},
+        "acc":  {"highlight": locs.get("prefix_sum", 0) - locs.get("k", 0)},
+    })
     def subarray_sum(nums: list, k: int) -> int:
         acc = defaultdict(int)
         acc[0] = 1
@@ -238,15 +241,6 @@ def _load_lc560():
             prefix_sum += num
             res += acc[prefix_sum - k]
             acc[prefix_sum] += 1
-
-            engine.step(
-                locals(),
-                mark={
-                    "nums": {"cursor": i},
-                    "acc":  {"highlight": prefix_sum - k},
-                },
-                label=f"i={i}  prefix={prefix_sum}  lookup acc[{prefix_sum - k}]",
-            )
 
         return res
 
